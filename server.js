@@ -4,8 +4,33 @@ const express     = require('express');
 const bodyParser  = require('body-parser');
 const expect      = require('chai').expect;
 const cors        = require('cors');
+const mongoose    = require('mongoose');
 require('dotenv').config();
 
+//connect to MongoDB
+mongoose.connect(process.env.MONGO_DB,
+  {useNewUrlParser: true, useUnifiedTopology: true});
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error'));
+db.once('open', () => { 
+  console.log("we're connected...")
+})
+//---------------------
+//Creating a Model
+const { Schema } = require('mongoose');
+const schema = new Schema({
+  assigned_to: String,
+  status_text: String,
+  open: Boolean,
+  issue_title: {type: String, required: true},
+  issue_test: {type: String, required: false},
+  created_by: {type: String, required: false},
+  created_on: {type: String, required: true},
+  updated_on: {type: String, required: false} 
+  });
+const Issue = mongoose.model('Issue', schema);
+module.exports = Issue;
+//---------------------
 const apiRoutes         = require('./routes/api.js');
 const fccTestingRoutes  = require('./routes/fcctesting.js');
 const runner            = require('./test-runner');
