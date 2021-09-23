@@ -26,7 +26,9 @@ const schema = new Schema({
   issue_test: {type: String, required: false},
   created_by: {type: String, required: false},
   created_on: {type: String, required: true},
-  updated_on: {type: String, required: false} 
+  updated_on: {type: String, required: false},
+  project: {type: String, required: true, select: false},
+  __v: {type: Number, select: false}
   });
 const Issue = mongoose.model('Issue', schema);
 module.exports = Issue;

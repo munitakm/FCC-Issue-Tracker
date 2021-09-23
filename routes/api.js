@@ -8,12 +8,17 @@ module.exports = function (app) {
   
     .get(function (req, res){
       let project = req.params.project;
-      console.log('List of Issues')
-      res.send('casa')
+      console.log('List of Issues of ' + project)
+      
+      Issue.find({project: project}, (err, found) => { 
+        res.json(found)
+      }) 
     })
     
     .post(function(req, res) {
+      let project = req.params.project;
       let p = req.body;
+      if(p.issue_title && p.issue_text && p.created_by) {
       let dateNow = new Date();
         console.log(p);
         let savedIssue = new Issue({
@@ -24,7 +29,8 @@ module.exports = function (app) {
           issue_test: p.issue_test,
           created_by: p.created_by,
           created_on: dateNow.toISOString(),
-          updated_on: dateNow.toISOString()
+          updated_on: dateNow.toISOString(),
+          project: project
         });
       savedIssue.save((err, saved) => { 
         if(err) console.log(err);
@@ -39,9 +45,12 @@ module.exports = function (app) {
           created_on: saved.created_on,
           updated_on: saved.updated_on
          
-         })
-      })
-  })
+          })
+        })
+      } else { 
+          res.json({error: 'required field(s) missing'})       
+      }
+})
     
     .put(function (req, res){
       let p = req.body;
@@ -81,7 +90,7 @@ module.exports = function (app) {
       let p = req.body;
       console.log('deleted');
       if(p._id.length == 24) {
-      Issue.remove({_id: p._id}, (err, deleted)=> { 
+      Issue.deleteOne({_id: p._id}, (err, deleted)=> { 
         if(err) { 
           res.json({error: 'could not delete', _id: p._id})
         } else { 
