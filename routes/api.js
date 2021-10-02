@@ -36,7 +36,7 @@ module.exports = function (app) {
           created_by: p.created_by,
           created_on: dateNow.toISOString(),
           updated_on: dateNow.toISOString(),
-          project: project
+          project: req.params.project
         });
       savedIssue.save((err, saved) => { 
         if(err) console.log(err);
@@ -50,7 +50,6 @@ module.exports = function (app) {
           created_by: saved.created_by,
           created_on: saved.created_on,
           updated_on: saved.updated_on
-         
           })
         })
       } else { 
@@ -74,24 +73,26 @@ module.exports = function (app) {
       p.status_text == ''
     ) return res.json({ error: 'no update field(s) sent', _id: p._id});
    console.log('chegamos ate aqui') 
-    if(p.open) {
+    if(p.open == 'false') {
       console.log('open falso');
-      Issue.findOneAndUpdate({_id: p._id, open: true}, {
+      Issue.findOneAndUpdate({_id: p._id, project: project, open: true}, {
         updated_on: dateUp.toISOString(),
         issue_title: p.issue_title,
         issue_text: p.issue_text,
         created_by: p.created_by,
         assigned_to: p.assigned_to,
         status_text: p.status_text,
+        open: false
       }, (err, found) => { 
-      if(err) { 
+      if(err || found == null) { 
+        console.log(err)
         return res.json({error: 'could not update', _id: p._id})
       } 
       res.json({result: 'successfully updated', _id: p._id})
       })
     } else { 
       console.log('open true');
-       Issue.findOneAndUpdate({ _id: p._id, open: true}, { 
+       Issue.findOneAndUpdate({ _id: p._id, project: project, open: true}, { 
         updated_on: dateUp.toISOString(),
         issue_title: p.issue_title,
         issue_text: p.issue_text,
@@ -99,25 +100,32 @@ module.exports = function (app) {
         assigned_to: p.assigned_to,
         status_text: p.status_text,
       }, (err, found) => { 
-        if(err) {
+        if(err || found == null) {
+          console.log(found)
           return res.json({error: 'could not update', _id: p._id})
         }
+        console.log(found)
         res.json({result: 'successfully updated', _id: p._id})
       })
     }     
 })  
     
     .delete(function (req, res){
+      let project = req.params.project;
       let p = req.body;
-      console.log('deleted');
-      if(p._id.length == 24) {
-      Issue.deleteOne({_id: p._id}, (err, deleted)=> { 
-        if(err) { 
+      console.log(p);
+      if((/^[a-fA-F0-9]{24}$/).test(p._id)) {
+      Issue.findOneAndRemove({_id: p._id, project: project}, function(err,deleted) { 
+        if(err || deleted == null) {
+          console.log(deleted)
           res.json({error: 'could not delete', _id: p._id})
         } else { 
+          console.log(deleted)
           res.json({result: 'successfully deleted', _id: p._id})
         }
       })
+    } else { 
+          res.json({error: 'missing _id'})
     }
   });
     
