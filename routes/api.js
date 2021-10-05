@@ -62,17 +62,23 @@ module.exports = function (app) {
       let p = req.body;
       let dateUp = new Date();
       console.log(req.body);
-     if(!(/^[a-fA-F0-9]{24}$/).test(p._id)) return res.json( 
-      { error: 'missing _id'}
-     );
+     if(!(/^[a-fA-F0-9]{24}$/).test(p._id)) {
+      return res.json({error: 'missing _id'})
+     }
+   try { 
     if( 
-      p.issue_title == '' &&
-      p.issue_text == '' &&
-      p.created_by == '' &&
-      p.assigned_to == '' &&
-      p.status_text == ''
-    ) return res.json({ error: 'no update field(s) sent', _id: p._id});
-   console.log('chegamos ate aqui') 
+      p.issue_title.trim() == '' &&
+      p.issue_text.trim() ==  '' &&
+      p.created_by.trim() == '' &&
+      p.assigned_to.trim() == '' &&
+      p.status_text.trim() == ''
+    ) { 
+      return res.json({error: 'no update field(s) sent', _id: p._id})
+    }
+  } catch(err) { 
+      return res.json({ error: 'could not update', _id: p._id})
+  }
+
     if(p.open == 'false') {
       console.log('open falso');
       Issue.findOneAndUpdate({_id: p._id, project: project, open: true}, {
