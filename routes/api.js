@@ -16,7 +16,7 @@ module.exports = function (app) {
         if(err) { 
           res.send(found);
         } else {
-        res.send(found)
+          res.json(found)
         }
       }) 
     }) 
@@ -67,11 +67,7 @@ module.exports = function (app) {
      }
    try { 
     if( 
-      p.issue_title.trim() == '' &&
-      p.issue_text.trim() ==  '' &&
-      p.created_by.trim() == '' &&
-      p.assigned_to.trim() == '' &&
-      p.status_text.trim() == ''
+      Object.keys(p).length  == 1
     ) { 
       return res.json({error: 'no update field(s) sent', _id: p._id})
     }

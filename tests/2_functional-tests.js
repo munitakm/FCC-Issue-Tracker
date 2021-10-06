@@ -102,7 +102,7 @@ suite('Functional Tests', function() {
       done();
     })
   })
-  test('Update  multiple field: PUT', (done) => { 
+  test('Update  multiple fields: PUT', (done) => { 
     chai.request(server)
     .put('/api/issues/test')
     .send({_id: id_test, issue_title: 'title updated2', issue_text: "lalisa"})
@@ -130,7 +130,9 @@ suite('Functional Tests', function() {
   test('Update an issue with no fields: PUT', (done) => { 
     chai.request(server)
     .put('/api/issues/test')
-    .send({_id: id_test })
+    .send({
+      _id: id_test,
+    })
     .end(function(err,res) { 
       assert.equal(res.status, 200);
       assert.deepEqual(res.body, { 
@@ -140,8 +142,46 @@ suite('Functional Tests', function() {
       done();
     })
   })
-
-
+  test('Update an issue with an invalid _id: PUT', (done) => { 
+    chai.request(server)
+    .put('/api/issues/test')
+    .send({_id: 'invalid_id1234567890', issue_title: 'invalid test'})
+    .end(function(err,res) { 
+      assert.equal(res.status, 200);
+      assert.deepEqual(res.body, {error: 'missing _id'});
+      done();
+    })
+  })
+  test('Delete an issue: DELETE', (done) => { 
+    chai.request(server)
+    .delete('/api/issues/test')
+    .send({_id: id_test})
+    .end(function(err,res) { 
+      assert.equal(res.status, 200);
+      assert.deepEqual(res.body, {result: 'successfully deleted', _id: id_test});
+      done();
+    })
+  })
+  test('Delete an issue with invalid _id: DELETE', (done) => { 
+    chai.request(server)
+    .delete('/api/issues/test')
+    .send({_id: '012345678901234567891234'})
+    .end(function(err,res) { 
+      assert.equal(res.status, 200);
+      assert.deepEqual(res.body, {error: 'could not delete', _id: '012345678901234567891234'});
+      done();
+    })
+  })
+  test('Delete an issue with missing _id: DELETE', (done) => { 
+    chai.request(server)
+    .delete('/api/issues/test')
+    .send({_id: 'missing_id'})
+    .end(function(err,res) { 
+      assert.equal(res.status, 200);
+      assert.deepEqual(res.body, {error: 'missing _id'});
+      done();
+    })
+  })
 
 })
 

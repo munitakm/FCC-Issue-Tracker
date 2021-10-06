@@ -19,15 +19,15 @@ db.once('open', () => {
 //Creating a Model
 const { Schema } = require('mongoose');
 const schema = new Schema({
-  assigned_to: {type: String, select: true},
+  assigned_to: {type: String, default: "", require: false, select: true},
   status_text: {type: String, default: "", select: true},
   open: {type: Boolean, default: true, select: true},
   issue_title: {type: String, required: true, select: true},
   issue_text: {type: String, required: true, select: true},
   created_by: {type: String, required: true, select: true},
-  created_on: {type: String, required: false, select: true},
-  updated_on: {type: String, required: false, select: true},
-  project: {type: String, required: true, select: false},
+  created_on: {type: String, default: "", required: false, select: true},
+  updated_on: {type: String, default: "", required: false, select: true},
+  project: {type: String, default: "", required: true, select: false},
   __v: {type: Number, select: false}
   });
 const Issue = mongoose.model('Issue', schema);
